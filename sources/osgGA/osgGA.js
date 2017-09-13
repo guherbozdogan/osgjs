@@ -1,6 +1,8 @@
 'use strict';
 var Hammer = require('hammer');
 var CADManipulator = require('osgGA/CADManipulator');
+var CCADManipulator = require('osgGA/CCADManipulator');
+
 var CADManipulatorStandardMouseKeyboardController = require('osgGA/CADManipulatorStandardMouseKeyboardController');
 var CADManipulatorHammerController = require('osgGA/CADManipulatorHammerController');
 var FirstPersonManipulator = require('osgGA/FirstPersonManipulator');
@@ -17,10 +19,11 @@ var OrbitManipulatorStandardMouseKeyboardController = require('osgGA/OrbitManipu
 var OrbitManipulatorWebVRController = require('osgGA/OrbitManipulatorWebVRController');
 var SwitchManipulator = require('osgGA/SwitchManipulator');
 var OrbitManipulatorEnums = require('osgGA/orbitManipulatorEnums');
-
 var osgGA = {};
 
 Hammer.NO_MOUSEEVENTS = true; // disable hammer js mouse events
+
+osgGA.CCADManipulator = CCADManipulator;
 
 osgGA.CADManipulator = CADManipulator;
 osgGA.getCADManipulatorStandardMouseKeyboardController = function() {

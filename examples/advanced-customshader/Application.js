@@ -9,9 +9,13 @@
     var osgShader = OSG.osgShader;
     var Object = window.Object;
 
+    var ShaderHelper = window.CShapeHelper;
+
+    var ShapeHelper = window.CShapeHelper;
+
     var $ = window.$;
 
-    var Example = function() {
+    var Application = function() {
         // documented here for classes that will inherits
         // so that we have a shared common set of variables
 
@@ -46,7 +50,7 @@
         this._debugDepthProgram = undefined;
     };
 
-    Example.prototype = {
+    Application.prototype = {
         run: function(options) {
             // get url parameter to override default _config values
             this.setConfigFromOptionsURL();
@@ -77,6 +81,15 @@
 
         getRootNode: function() {
             return this._root;
+        },
+
+        createTexture: function(image) {
+            var texture = new osg.Texture();
+            texture.setImage(image);
+            texture.setWrapT('REPEAT');
+            texture.setWrapS('REPEAT');
+            texture.setMinFilter('LINEAR_MIPMAP_LINEAR');
+            return texture;
         },
 
         setConfigFromOptionsURL: function() {
@@ -120,7 +133,7 @@
             return images;
 
             // wait for all images
-            //P.all( images ).then( function ( args ) {}
+            // P.all( images ).then( function ( args ) {}
         },
 
         setShaderPath: function(path) {
@@ -359,7 +372,7 @@
                     '{',
                     '  vec2 uv = vTexCoord0;',
                     '  vec4 color = vec4(texture2D(Texture0, uv));',
-                    '  gl_FragColor = vec4( color.r, color.r, color.r, 1.0 );',
+                    '  gl_FragColor = vec4( color.r, color.g, color.b, 1.0 );',
                     '}',
                     ''
                 ].join('\n');
@@ -370,6 +383,15 @@
                 );
             }
             return this._debugDepthProgram;
+        },
+
+        addNode: function(node) {
+            if (!this._model) {
+                this._model = new osg.MatrixTransform();
+            }
+
+            this._model.addChild(node);
+            return this._model;
         },
 
         // get the model
@@ -385,10 +407,46 @@
                     model.addChild(node);
                 });
             } else {
-                var size = 10;
-                var geom = osg.createTexturedBoxGeometry(0, 0, 0, size, size, size);
-                model.addChild(geom);
+                var size = 9;
+                var s = new ShapeHelper();
+                var geom = s.createTexturedBoxGeometry(0, 0, 0, size, size, size / 6);
+                //var geom = osg.createTexturedBoxGeometry(0, 0, 0, size, size, size);
+                //var images = this.readTextures(['seamless/IconTail/svg/Line/IconTail/Seo/30px/Coding.svg']);
+                //var images = this.readTextures(['seamless/bricks1.jpg']);
+                var images = this.readTextures(['seamless/grunge1.jpg']);
+                //var images = this.readTextures(['alpha/basic.png']);
+
+                P.all(images)
+                    .bind(this)
+                    .then(
+                        function(args) {
+                            args.forEach(
+                                function(t) {
+                                    geom
+                                        .getOrCreateStateSet()
+                                        .setTextureAttributeAndModes(0, this.createTexture(t));
+                                }.bind(this)
+                            );
+                        }.bind(this)
+                    )
+                    .bind(this);
             }
+            model.addChild(geom);
+            model
+                .getOrCreateStateSet()
+                .setAttributeAndModes(
+                    this.createShader(
+                        'shaders/standardVertexShader.glsl',
+                        [""],
+                        'shaders/standardFragmentShader.glsl',
+                        [""]
+                    )
+                );
+            var lightPos = osg.Uniform.createFloat3([0, 0, -10], 'lightPos');
+            model.getOrCreateStateSet().addUniform(lightPos);
+
+            var eyePos = osg.Uniform.createFloat3([0, 0, -1], 'eyePos');
+            model.getOrCreateStateSet().addUniform(eyePos);
 
             return model;
         },
@@ -402,6 +460,7 @@
             }
 
             this._model.addChild(this.createModel(modelName));
+
             return this._model;
         },
 
@@ -411,5 +470,5 @@
         }
     };
 
-    window.ExampleOSGJS2 = Example;
+    window.AppOSGJS = Application;
 })();

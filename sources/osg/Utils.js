@@ -111,6 +111,8 @@ Utils.extend = function() {
 };
 
 Utils.objectInherit = function(base /*, extras*/) {
+    'use strict';
+
     function F() {}
     F.prototype = base;
     var obj = new F();
@@ -123,6 +125,8 @@ Utils.objectInherit = function(base /*, extras*/) {
 };
 
 Utils.objectMix = function(obj, properties, test) {
+    'use strict';
+
     for (var key in properties) {
         if (!(test && obj[key])) {
             obj[key] = properties[key];
