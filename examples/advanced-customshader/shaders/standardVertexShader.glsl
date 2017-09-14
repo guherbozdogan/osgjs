@@ -28,7 +28,7 @@ void main(void) {
     v = normalize ( eyePos - p);
 
 
-    n = normalize(vec3(uModelViewMatrix * vec4(Normal,1.0)));
+    n = normalize(vec3(uModelViewNormalMatrix * Normal));
     //Vertex.x = Vertex.x + rand(1.0); Vertex.y = Vertex.y + rand(1.0);
 
      gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(Vertex,1.0);

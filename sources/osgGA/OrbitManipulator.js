@@ -337,13 +337,18 @@ MACROUTILS.createPrototypeObject(
         },
 
         computeEyePosition: (function() {
-            var tmpDist = vec3.create();
-            var tmpInverse = mat4.create();
+            //            var tmpDist = vec3.create();
+            //          var tmpInverse = mat4.create();
             return function(target, distance, eye) {
+                var tmpDist = vec3.create();
+                var tmpInverse = mat4.create();
+
                 mat4.invert(tmpInverse, this._rotation);
                 tmpDist[1] = distance;
                 vec3.transformMat4(eye, tmpDist, tmpInverse);
                 vec3.add(eye, target, eye);
+                console.log("----"+target+"----"+distance+"----"+eye+"----")
+
             };
         })(),
 

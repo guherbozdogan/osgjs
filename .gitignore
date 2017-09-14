@@ -20,6 +20,7 @@ test/lighting
 .hooks
 IconTail
 IconTail/
+IconTail/**
 builds
 builds/active
 builds/active/OSG.js

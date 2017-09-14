@@ -437,17 +437,33 @@
                 .setAttributeAndModes(
                     this.createShader(
                         'shaders/standardVertexShader.glsl',
-                        [""],
+                        [''],
                         'shaders/standardFragmentShader.glsl',
-                        [""]
+                        ['']
                     )
                 );
-            var lightPos = osg.Uniform.createFloat3([0, 0, -10], 'lightPos');
+            var lightPos = osg.Uniform.createFloat3([0, 0, 60], 'lightPos');
             model.getOrCreateStateSet().addUniform(lightPos);
 
             var eyePos = osg.Uniform.createFloat3([0, 0, -1], 'eyePos');
             model.getOrCreateStateSet().addUniform(eyePos);
 
+            var manip = this._viewer.getManipulator();
+            var StateSetUpdateCallback = function() {
+                this.update = function(stateset, nv) {
+                    //stateset.removeUniform('eyePos');
+                    var tmpEye = osg.vec3.create();
+                    this.computeEyePosition( this._target, this._distance, tmpEye);
+
+
+                   // var eyePosTmp = osg.Uniform.createFloat3([tmpEye.x, tmpEye.y, tmpEye.z], 'eyePos');
+                    //stateset.addUniform(eyePosTmp);
+
+                }.bind(manip);
+            };
+
+            var ss = model.getOrCreateStateSet();
+            ss.addUpdateCallback(new StateSetUpdateCallback());
             return model;
         },
 
