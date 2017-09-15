@@ -20,6 +20,20 @@ void main(void) {
 
     vec2 uv = vTexCoord0;
     vec4 tcolor = vec4(texture2D(Texture0, uv));
+    //gl_FragColor = spec+diff+tcolor;
+      gl_FragColor = diffColor;
+    //float a = abs(uv.x);
+    //float b = abs(uv.y);
 
-    gl_FragColor = spec+diff+tcolor;
+    //if ( a>= 0.995  || b>=  0.995 || a<=0.005 || b<=0.005)
+    //{
+       //gl_FragColor = spec+diff+tcolor;
+      // gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    //}
+    //else
+    //{
+      // gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    //}
+
+
 }

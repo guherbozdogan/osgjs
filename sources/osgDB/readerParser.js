@@ -23,7 +23,12 @@ ReaderParser.ObjectWrapper.serializers = {};
 ReaderParser.readImage = function(url, options) {
     return ReaderParser.registry().readImageURL(url, options);
 };
+
+ReaderParser.readHTMLCanvasImage = function(url, options) {
+    return ReaderParser.registry().readHTMLCanvasImageURL(url, options);
+};
 ReaderParser.readImageURL = ReaderParser.readImage; // alias
+ReaderParser.readHTMLCanvasImageURL = ReaderParser.readHTMLCanvasImage; // alias
 
 ReaderParser.readBinaryArrayURL = function(url, options) {
     return ReaderParser.registry().readBinaryArrayURL(url, options);

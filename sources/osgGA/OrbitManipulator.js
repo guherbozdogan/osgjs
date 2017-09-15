@@ -347,8 +347,6 @@ MACROUTILS.createPrototypeObject(
                 tmpDist[1] = distance;
                 vec3.transformMat4(eye, tmpDist, tmpInverse);
                 vec3.add(eye, target, eye);
-                console.log("----"+target+"----"+distance+"----"+eye+"----")
-
             };
         })(),
 

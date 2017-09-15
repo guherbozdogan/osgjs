@@ -137,6 +137,36 @@ Input.prototype = {
         return new scope();
     },
 
+    fetchHTMLCanvasImage: function(image, url, options, defer) {
+        var checkInlineImage = 'data:image/';
+        // crossOrigin does not work for inline data image
+        var isInlineImage = url.substring(0, checkInlineImage.length) === checkInlineImage;
+        var img = new window.Image();
+        img.onerror = function() {
+            Notify.warn('warning use white texture as fallback instead of ' + url);
+            image.setImage(Input.imageFallback);
+            if (defer) {
+                defer.resolve(image);
+            }
+        };
+
+        if (!isInlineImage && options.imageCrossOrigin) {
+            img.crossOrigin = options.imageCrossOrigin;
+        }
+
+        img.onload = function() {
+            if (defer) {
+                if (options.imageOnload) options.imageOnload.call(image);
+                defer.resolve(image);
+            } else if (options.imageOnload) options.imageOnload.call(image);
+        };
+
+        image.setURL(url);
+        image.setImage(img);
+
+        img.src = url;
+        return image;
+    },
     fetchImage: function(image, url, options, defer) {
         var checkInlineImage = 'data:image/';
         // crossOrigin does not work for inline data image
@@ -166,6 +196,36 @@ Input.prototype = {
 
         img.src = url;
         return image;
+    },
+    readHTMLCanvasImageURL: function(url, options) {
+        if (options === undefined) {
+            options = this._defaultOptions;
+        }
+
+        // hook reader
+        if (options.readHTMLCanvasImageURL) {
+            // be carefull if you plan to call hook the call and after
+            // call the original readImageURL, you will need to remove
+            // from options the readImageURL if you dont want an infinte
+            // recursion call
+            return options.readHTMLCanvasImageURL.call(this, url, options);
+        }
+
+        // if image is on inline image skip url computation
+        if (url.substr(0, 10) !== 'data:image') {
+            url = this.computeURL(url);
+        }
+
+
+        var image = new Image();
+        if (options.imageLoadingUsePromise !== true) {
+            return this.fetchImage(image, url, options);
+        }
+
+        var defer = P.defer();
+        this.fetchImage(image, url, options, defer);
+
+        return defer.promise;
     },
 
     readImageURL: function(url, options) {

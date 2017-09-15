@@ -13,6 +13,8 @@
 
     var ShapeHelper = window.CShapeHelper;
 
+    var Billboard = window.Billboard;
+
     var $ = window.$;
 
     var Application = function() {
@@ -114,6 +116,25 @@
                     osg.log('cannot parse url option: ' + property);
                 }
             }
+        },
+        readHTMLCanvasIMG: function(textures) {
+            var textureNames = textures || this._textureNames;
+            var path = this._mediaPath + 'textures/';
+
+            // generate array of paths
+            var paths = textureNames.map(function(name) {
+                return path + name;
+            });
+
+            // generate array of promise
+            var images = paths.map(function(pathname) {
+                return osgDB.readImageURL(pathname);
+            });
+
+            return images;
+
+            // wait for all images
+            // P.all( images ).then( function ( args ) {}
         },
 
         readTextures: function(textures) {
@@ -409,8 +430,20 @@
             } else {
                 var size = 9;
                 var s = new ShapeHelper();
-                var geom = s.createTexturedBoxGeometry(0, 0, 0, size, size, size / 6);
-                //var geom = osg.createTexturedBoxGeometry(0, 0, 0, size, size, size);
+                //var geom = s.createTexturedBoxGeometry(0, 0, 0, size, size, size / 6);
+                var geom = s.createTexturedBoxGeometryLines(0, 0, 0, size, size, size / 6);
+                geom.getOrCreateStateSet().setAttributeAndModes(new osg.CullFace());
+
+                var material = new osg.Material();
+                material.setDiffuse([1, 0, 0, 1]);
+                material.setAmbient([1, 0, 0, 1]);
+
+                //var newGeom = billboard.create(-(size-1)/2.0,-(size-1)/2.0,0, size-1, size-1, 0,0.0, 0.0, size/3, this._viewer.getManipulator());
+
+                //osg.createTexturedQuadGeometry(-(size-1)/2.0,-(size-1)/2.0,0, size-1, size-1, 0,0.0, 0.0, size/3);
+
+                // newGeom.getOrCreateStateSet().setAttributeAndModes(material);
+                //var geom = osg.createTexturedBoxGeometry(0, 0, 0, size, size, size/6);
                 //var images = this.readTextures(['seamless/IconTail/svg/Line/IconTail/Seo/30px/Coding.svg']);
                 //var images = this.readTextures(['seamless/bricks1.jpg']);
                 var images = this.readTextures(['seamless/grunge1.jpg']);
@@ -431,8 +464,43 @@
                     )
                     .bind(this);
             }
+            var images2 = this.readTextures(['seamless/bricks1.jpg']);
+            //var images = this.readTextures(['alpha/basic.png']);
+
+            P.all(images2)
+                .bind(this)
+                .then(
+                    function(args) {
+                        args.forEach(
+                            function(t) {
+                                //var img=t.getImage();
+
+                                //
+                                // createImageBitmap(img).then(function(response) {
+                                //     var billboard = new Billboard(response);
+                                //     billboard.setPosition([0.0,0.0,10.0])
+                                //     billboard.setAutoRotateToScreen(true);
+                                //
+                                //     model.addChild(billboard);
+
+                                //})
+
+                                var billboard = new Billboard(t,50,50);
+                                billboard.setPosition([0.0, 0.0, 0.0]);
+                                billboard.setAutoRotateToScreen(true);
+                                billboard.setAutoScaleToScreen(true);
+
+                                model.addChild(billboard);
+                            }.bind(this)
+                        );
+                    }.bind(this)
+                )
+                .bind(this);
+
             model.addChild(geom);
-            model
+            //model.addChild(newGeom);
+            /*
+            newGeom
                 .getOrCreateStateSet()
                 .setAttributeAndModes(
                     this.createShader(
@@ -442,6 +510,7 @@
                         ['']
                     )
                 );
+                */
             var lightPos = osg.Uniform.createFloat3([0, 0, 60], 'lightPos');
             model.getOrCreateStateSet().addUniform(lightPos);
 
@@ -453,12 +522,10 @@
                 this.update = function(stateset, nv) {
                     //stateset.removeUniform('eyePos');
                     var tmpEye = osg.vec3.create();
-                    this.computeEyePosition( this._target, this._distance, tmpEye);
+                    this.computeEyePosition(this._target, this._distance, tmpEye);
 
-
-                   // var eyePosTmp = osg.Uniform.createFloat3([tmpEye.x, tmpEye.y, tmpEye.z], 'eyePos');
+                    // var eyePosTmp = osg.Uniform.createFloat3([tmpEye.x, tmpEye.y, tmpEye.z], 'eyePos');
                     //stateset.addUniform(eyePosTmp);
-
                 }.bind(manip);
             };
 

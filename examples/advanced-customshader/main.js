@@ -63,7 +63,10 @@
                 ])
                 .bind(app)
                 .then(function() {
-                    app.run();
+                    app.run({
+                        antialias: true,
+                        alpha: true
+                    });
                 });
         },
         true
