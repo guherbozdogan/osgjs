@@ -21,11 +21,4 @@ test/lighting
 IconTail
 IconTail/
 IconTail/**
-builds
-builds/active
-builds/active/OSG.js
-builds/active/OSG.js.map
-builds/dist/OSG.js
-builds/dist/OSG.js.map
-sources/version.js
 examples/media/*
